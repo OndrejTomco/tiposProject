@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const User = require('../model/user');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.register_user = (req,res,next) => {
     User.find({$or: [{email:req.body.email},{login:req.body.login}]})
@@ -29,7 +30,8 @@ exports.register_user = (req,res,next) => {
                     .then(savedUser => {
                         console.log(savedUser);
                         res.status(201).json({
-                            message:'user created'
+                            message:'user created',
+                            
                         });
                     }).catch(err => {
                         console.log(err);
@@ -48,12 +50,35 @@ exports.login = (req,res,next) => {
     .then(user => {
         if(user.length < 1){
             return res.status(401).json({
-                message:'login not found'
-            })
+                message:'authentication failed'
+            });
         } else{
-            return res.status(200).json({
-                message:'login found'
-            })
+            bcrypt.compare(req.body.password,user[0].password, (err,match) => {
+                if(err){
+                    return res.status(401).json({
+                        message:'authentication failed'
+                    });
+                }
+                if(match) {
+                    const token = jwt.sign({
+                        email:user[0].email,
+                        userId: user[0]._id
+                    },
+                    process.env.JWT_KEY,
+                    {expiresIn: "1h"})
+
+                    return res.status(200).json({
+                        message: 'authentication successful',
+                        token,
+                        userId:user[0]._id
+                    });
+                }
+
+                res.status(401).json({
+                    message:'authentication failed'
+                });
+            });
+
         }
     });
 }

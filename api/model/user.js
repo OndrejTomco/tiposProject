@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const bets = require('../model/bet').schema;
+const bets = require('../model/bet');
 
 mongoose.connect('mongodb://localhost/TiposDB');
 
@@ -16,7 +16,7 @@ const userSchema = new Schema({
         unique:true
     },
     password: String,
-    bets:[bets]
+    bets:[{type:Schema.Types.ObjectId, ref:'bets'}]
 
 });
 
