@@ -5,6 +5,7 @@ const Bet = require('../model/bet');
 exports.create_new_bet = (req,res,next) => {
     console.log(req.body);
     const newBet = new Bet({
+        userId:req.body.id,
         bet1:req.body.bet1,
         bet2:req.body.bet2,
         bet3:req.body.bet3,
@@ -14,19 +15,13 @@ exports.create_new_bet = (req,res,next) => {
     newBet
     .save()
     .then((savedBet) => {
-        User.update(
-            {_id:req.body.id},
-            {$push:{"bets":savedBet._id}}
-        ).then(()=> {
-            return res.status(201).json({
-                message:'bet successfuly inserted'
-            });
-        })
-    })
-    .catch((error)=> {
-        res.status(500).json({
-            error:err
+        return res.status(201).json({
+            message:'bet created'
         });
     })
-    
+    .catch(err => {
+        return res.status(500).json({
+            error:err
+        });
+    });    
 }

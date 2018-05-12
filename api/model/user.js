@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bets = require('../model/bet');
+const user = require('../model/user');
 
 mongoose.connect('mongodb://localhost/TiposDB');
 
